@@ -10,3 +10,8 @@ wiki/
 
 # Results
 output/
+voxel/
+uploads/
+.idea
+.vscode
+venv

@@ -348,9 +348,9 @@ class PoolLayer(Layer):
     def set_output(self):
         pooled_out = pool.pool_2d(
             input=self._prev_layer.output,
-            ds=self._pool_size,
+            ws=self._pool_size,
             ignore_border=True,
-            padding=self._padding)
+            pad=self._padding)
         self._output = pooled_out
 
 
