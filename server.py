@@ -18,6 +18,13 @@ import numpy as np
 
 verbose = ((sys.argv[1] if 1 < len(sys.argv) else "") == "verbose")
 
+# For SSL pass through a proxy.
+PORT = 8000
+
+# Number of images taken before a voxel model is generated.
+IMAGE_COUNT = 4
+
+# Paths
 STATIC_APP_FOLDER = os.path.join(os.path.dirname(__file__), 'app/dist')
 STATIC_UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 STATIC_VOXEL_FOLDER = os.path.join(os.path.dirname(__file__), 'voxel')
@@ -53,7 +60,8 @@ def copy_file(old="avon.png", new="avon.png"):
 def load_demo_images():
     ims = []
     files = []
-    for i in range(3):
+
+    for i in range(IMAGE_COUNT):
         file = 'uploads/%d.png' % i
         files.append(file)
         im = Image.open(file)
@@ -91,7 +99,8 @@ class UploadHandler(tornado.web.RequestHandler):
         try:
             self.application.logger.info("Recieved a file")
             file = self.request.files['file'][0]
-            count = len(os.listdir("uploads/"))
+            pngs = [file for file in os.listdir("uploads/") if file.endswith('.png')]
+            count = len(pngs)
             filename = f"{count}.png"
             output_file = open("uploads/" + filename, 'wb')
             output_file.write(file['body'])
@@ -102,9 +111,9 @@ class UploadHandler(tornado.web.RequestHandler):
             im = im.resize((127, 127), Image.ANTIALIAS).convert('RGB')
             im.save("uploads/" + filename, "PNG")
 
-            if count > 1:
-                print("rendering")
+            if len([file for file in os.listdir("uploads/") if file.endswith('.png')]) >= IMAGE_COUNT:
                 files, prediction_file = render()
+                print("Building model based on:", files)
                 for file in files:
                     os.remove(file)
                 self.write({'prediction': prediction_file})
@@ -133,26 +142,18 @@ class MainApplication(tornado.web.Application):
 
         # Add the handlers here - use regular expressions or hardcoded paths to link the endpoints
         # with handlers?
-        self.port = settings.get('port', 8000)
+        self.port = settings.get('port', PORT)
         self.address = settings.get('address', "0.0.0.0")
         self.ioloop = tornado.ioloop.IOLoop.instance()
         self.logger = logging.getLogger()
+        self.ssl_options = {"certfile": os.path.join("config/server.crt"), "keyfile": os.path.join("certs/server.key")}
 
         # Tie the handlers to the routes here
         self.add_handlers(".*", [
             (r"/upload", UploadHandler),
-            (
-                r"/voxel/(.*)", tornado.web.StaticFileHandler,
-                {"path": STATIC_VOXEL_FOLDER}
-            ),
-            (
-                r"/uploads/(.*)", tornado.web.StaticFileHandler,
-                {"path": STATIC_UPLOAD_FOLDER}
-            ),
-            (
-                r"/(.*)", tornado.web.StaticFileHandler,
-                {"path": STATIC_APP_FOLDER}
-            )
+            (r"/voxel/(.*)", tornado.web.StaticFileHandler, {"path": STATIC_VOXEL_FOLDER}),
+            (r"/uploads/(.*)", tornado.web.StaticFileHandler, {"path": STATIC_UPLOAD_FOLDER}),
+            (r"/(.*)", tornado.web.StaticFileHandler, {"path": STATIC_APP_FOLDER}),
         ])
 
     def run(self):
@@ -169,7 +170,7 @@ class MainApplication(tornado.web.Application):
 
 
 if __name__ == "__main__":
-    tornado.options.define('port', default=9000, help='Port to listen on.')
+    tornado.options.define('port', default=PORT, help='Port to listen on.')
 
     host = "0.0.0.0"
     if sys.platform == "win32":

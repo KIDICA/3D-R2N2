@@ -11,7 +11,14 @@ wiki/
 # Results
 output/
 voxel/
-uploads/
 .idea
 .vscode
 venv
+uploads/**
+!uploads/empty
+voxel/**
+!voxel/empty
+imgs/test*
+/app/public/prediction.obj
+/config/
+/prediction.obj

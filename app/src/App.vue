@@ -3,6 +3,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark static-top bg-primary">
       <div class="container">
         <a class="navbar-brand rubik branding" href="#">3D-R2N2</a>
+        <!--
         <button
             class="navbar-toggler"
             type="button"
@@ -13,27 +14,23 @@
             aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto" style="display: none">
-          </ul>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ml-auto" style="display: none"></ul>
         </div>
+        -->
       </div>
     </nav>
 
     <div class="main container">
-      <capture></capture>
+      <router-view ref="view"></router-view>
     </div>
   </div>
 </template>
 
 <script>
-  import Capture from './components/Capture';
-
   export default {
     name: 'app',
-    components: {
-      "capture":Capture
-    }
+    components: {}
   }
 </script>
 
@@ -44,5 +41,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
+  }
+  .navbar {
+    z-index: 1;
   }
 </style>

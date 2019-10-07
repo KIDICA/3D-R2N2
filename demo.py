@@ -6,6 +6,7 @@ Reconstruction, ECCV 2016
 '''
 import os
 import sys
+
 if (sys.version_info < (3, 0)):
     raise Exception("Please follow the installation instruction on 'https://github.com/chrischoy/3D-R2N2'")
 
@@ -37,9 +38,12 @@ def download_model(fn):
 def load_demo_images():
     ims = []
     for i in range(3):
-        im = Image.open('imgs/%d.png' % i)
-        ims.append([np.array(im).transpose(
-            (2, 0, 1)).astype(np.float32) / 255.])
+        im = Image.open('imgs/test2/%d.png' % i)
+        # Has to be this exact size, the NN has this input shape, also 24-bit png.
+        im = im.resize((127, 127), Image.ANTIALIAS).convert('RGB')
+        # im.save('imgs/test1/%d.png' % i, "PNG")
+
+        ims.append([np.array(im).transpose((2, 0, 1)).astype(np.float32) / 255.])
     return np.array(ims)
 
 
@@ -59,8 +63,8 @@ def main():
 
     # Define a network and a solver. Solver provides a wrapper for the test function.
     net = NetClass(compute_grad=False)  # instantiate a network
-    net.load(DEFAULT_WEIGHTS)                        # load downloaded weights
-    solver = Solver(net)                # instantiate a solver
+    net.load(DEFAULT_WEIGHTS)  # load downloaded weights
+    solver = Solver(net)  # instantiate a solver
 
     # Run the network
     voxel_prediction, _ = solver.test_output(demo_imgs)

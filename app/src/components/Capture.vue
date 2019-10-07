@@ -18,16 +18,6 @@
               <font-awesome icon="camera" class="fa-2x text-primary"></font-awesome>
             </button>
           </div>
-          <div class="col-2 text-center p-0">
-            <button class="btn cam mb-1 text-primary" @click="render">
-              <font-awesome icon="print" class="fa-2x text-primary"></font-awesome>
-            </button>
-          </div>
-          <div class="col-2 text-center p-0">
-            <button class="btn cam mb-1 text-primary" @click="render">
-              <font-awesome icon="cube" class="fa-2x text-primary"></font-awesome>
-            </button>
-          </div>
           <div class="col"></div>
         </div>
       </slot>
@@ -77,7 +67,11 @@
             this.$log.debug(data);
             this.$emit("snapshot", data);
             this.busy = false;
-            this.$refs.cam.play();
+            if (response.data !== '') {
+              this.$router.push("/viewer");
+            } else {
+              this.$refs.cam.play();
+            }
           })
           .catch(error => {
             this.busy = false;
@@ -102,7 +96,7 @@
     },
     mounted() {
       this.cameraPhoto = new CameraPhoto(this.$refs.cam);
-      this.cameraPhoto.startCamera(FACING_MODES.ENVIRONMENT, {width: 200, height: 200})
+      this.cameraPhoto.startCamera(FACING_MODES.ENVIRONMENT, {width: 800, height: 800})
         .then(stream => {
           this.$log.debug("Camera started");
         })
