@@ -38,7 +38,7 @@ def download_model(fn):
 def load_demo_images():
     ims = []
     for i in range(3):
-        im = Image.open('imgs/test2/%d.png' % i)
+        im = Image.open('imgs/test3/%d.png' % i)
         # Has to be this exact size, the NN has this input shape, also 24-bit png.
         im = im.resize((127, 127), Image.ANTIALIAS).convert('RGB')
         # im.save('imgs/test1/%d.png' % i, "PNG")

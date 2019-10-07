@@ -22,7 +22,7 @@ verbose = ((sys.argv[1] if 1 < len(sys.argv) else "") == "verbose")
 PORT = 8000
 
 # Number of images taken before a voxel model is generated.
-IMAGE_COUNT = 4
+IMAGE_COUNT = 3
 
 # Paths
 STATIC_APP_FOLDER = os.path.join(os.path.dirname(__file__), 'app/dist')
@@ -108,7 +108,7 @@ class UploadHandler(tornado.web.RequestHandler):
 
             im = Image.open(f"uploads/{filename}")
             # Has to be this exact size, the NN has this input shape, also 24-bit png.
-            im = im.resize((127, 127), Image.ANTIALIAS).convert('RGB')
+            im = im.resize((127, 127), Image.BICUBIC).convert('RGB')
             im.save("uploads/" + filename, "PNG")
 
             if len([file for file in os.listdir("uploads/") if file.endswith('.png')]) >= IMAGE_COUNT:
