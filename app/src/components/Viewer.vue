@@ -63,9 +63,12 @@
         alert("print");
       },
       plus() {
+        this.camera.zoom += 0.1;
+        this.camera.updateProjectionMatrix();
       },
       minus() {
-        this.controls.pan(0, -this.controls.keyPanSpeed);
+        this.camera.zoom -= 0.1;
+        this.camera.updateProjectionMatrix();
       }
     },
     mounted() {
@@ -86,7 +89,7 @@
 
       const fov = 30;
       const aspect = 2;  // the canvas default
-      const near = 1;
+      const near = 0.1;
       const far = 100;
 
       const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
@@ -95,6 +98,7 @@
 
       this.controls = new THREE.OrbitControls(camera, this.$refs.viewers);
       this.controls.enablePan = false;
+      this.controls.panSpeed = 0.0001;
 
       const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
       hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -115,10 +119,6 @@
           }
         });
 
-        obj.scale.x = 10;
-        obj.scale.y = 10;
-        obj.scale.z = 10;
-
         // Center geometry.
         const box = new THREE.Box3().setFromObject(obj);
         const x = (box.max.x - box.min.x) / 2;
@@ -132,12 +132,14 @@
         group.add(obj);
 
         // Angle from above slightly lowered.
-        camera.position.x = x * 6;
+        camera.position.x = x * 8;
         camera.position.z = 0;
-        camera.position.y = y;
-        camera.lookAt(new THREE.Vector3(0, y, 0));
+        camera.position.y = y * 2;
+        camera.lookAt(new THREE.Vector3(0, -y, 0));
 
-        this.controls.target.set(0, camera.position.y, 0);
+        this.camera = camera;
+
+        this.controls.target.set(0, y, 0);
         this.controls.update();
 
         this.busy = false;
@@ -158,5 +160,4 @@
 </script>
 
 <style scoped>
-
 </style>

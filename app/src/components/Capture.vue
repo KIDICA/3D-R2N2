@@ -77,6 +77,7 @@
             this.busy = false;
             this.$refs.cam.play();
             this.$log.error(error);
+            alert(error);
           });
       },
       upload(file) {
@@ -96,7 +97,7 @@
     },
     mounted() {
       this.cameraPhoto = new CameraPhoto(this.$refs.cam);
-      this.cameraPhoto.startCamera(FACING_MODES.ENVIRONMENT, {width: 800, height: 800})
+      this.cameraPhoto.startCamera(FACING_MODES.ENVIRONMENT, {width: 600, height: 600})
         .then(stream => {
           this.$log.debug("Camera started");
         })
