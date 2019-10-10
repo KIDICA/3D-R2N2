@@ -25,20 +25,11 @@ PORT = 8000
 IMAGE_COUNT = 3
 
 # Paths
-STATIC_APP_FOLDER = os.path.join(os.path.dirname(__file__), 'app/dist')
-STATIC_UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
-STATIC_VOXEL_FOLDER = os.path.join(os.path.dirname(__file__), 'voxel')
-
-# This is where the temp image will go
-EXPORT_LOCATION = "/tmp"
-
-STATIC_IMG_FOLDER = os.path.join(
-    os.path.dirname(__file__),
-    "img"
-)
+APP_FOLDER = os.path.join(os.path.dirname(__file__), 'client', 'dist')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
+VOXEL_FOLDER = os.path.join(os.path.dirname(__file__), 'voxel')
 
 DEFAULT_WEIGHTS = 'output/ResidualGRUNet/default_model/weights.npy'
-
 
 def parse_static_filepath(filepath):
     split_filepath = filepath.split('/')
@@ -146,14 +137,16 @@ class MainApplication(tornado.web.Application):
         self.address = settings.get('address', "0.0.0.0")
         self.ioloop = tornado.ioloop.IOLoop.instance()
         self.logger = logging.getLogger()
-        self.ssl_options = {"certfile": os.path.join("config/server.crt"), "keyfile": os.path.join("certs/server.key")}
+        #self.ssl_options = {"certfile": os.path.join("config/server.crt"), "keyfile": os.path.join("certs/server.key")}
 
         # Tie the handlers to the routes here
         self.add_handlers(".*", [
             (r"/upload", UploadHandler),
-            (r"/voxel/(.*)", tornado.web.StaticFileHandler, {"path": STATIC_VOXEL_FOLDER}),
-            (r"/uploads/(.*)", tornado.web.StaticFileHandler, {"path": STATIC_UPLOAD_FOLDER}),
-            (r"/(.*)", tornado.web.StaticFileHandler, {"path": STATIC_APP_FOLDER}),
+            (r"/voxel/(.*)", tornado.web.StaticFileHandler, {"path": VOXEL_FOLDER}),
+            (r"/uploads/(.*)", tornado.web.StaticFileHandler, {"path": UPLOAD_FOLDER}),
+            ("/", tornado.web.RedirectHandler, {"url": "/index.html"}),
+            (r"/\/#(.*)", tornado.web.RedirectHandler, {"url": "/index.html#{0}"}),
+            (r"/(.*)", tornado.web.StaticFileHandler, {"path": APP_FOLDER}),
         ])
 
     def run(self):

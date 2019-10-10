@@ -19,6 +19,6 @@ uploads/**
 voxel/**
 !voxel/empty
 imgs/test*
-/app/public/prediction.obj
+/client/public/prediction.obj
 /config/
 /prediction.obj
