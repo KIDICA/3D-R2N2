@@ -5,6 +5,8 @@
 This project is a fork of an implementation of 3D-R2N2 from the paper [Choy et al., 3D-R2N2: A Unified Approach for Single and Multi-view 3D Object Reconstruction, ECCV 2016](http://arxiv.org/abs/1604.00449).
 Given one or multiple views of an object, the network generates voxelized ( a voxel is the 3D equivalent of a pixel) reconstruction of the object in 3D.
 
+A demo by the authors can be seen at: http://3d-r2n2.stanford.edu/viewer/
+
 Original repo: https://github.com/chrischoy/3D-R2N2
 
 Additionally this repo contains an Vue.js frontend, optimized for mobile usage to capture images on the go and view a server-side generated 3D model, which can display the result right on the mobile device via WebGL.
@@ -18,6 +20,8 @@ Additionally this repo contains an Vue.js frontend, optimized for mobile usage t
 ## Getting started
 
 The project consists of three components, the python 3D-R2N2 implementation, a python web-server and a Vue.js frontend.
+
+### Installation
 
 #### Server
 
@@ -40,8 +44,15 @@ python3.7 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+##### Datasets
 
-Start the server.
+We used [ShapeNet](http://shapenet.cs.stanford.edu) models to generate rendered images and voxelized models which are available below (you can follow the installation instruction below to extract it to the default directory).
+
+* ShapeNet rendered images [http://cvgl.stanford.edu/data2/ShapeNetRendering.tgz](http://cvgl.stanford.edu/data2/ShapeNetRendering.tgz)
+* ShapeNet voxelized models [http://cvgl.stanford.edu/data2/ShapeNetVox32.tgz](http://cvgl.stanford.edu/data2/ShapeNetVox32.tgz)
+* Trained ResidualGRUNet Weights [http://cvgl.stanford.edu/data2/ResidualGRUNet.npy](http://cvgl.stanford.edu/data2/ResidualGRUNet.npy)
+
+##### Starting the server.
 
 ```shell script
 python server.py
@@ -49,7 +60,51 @@ python server.py
 
 Now you can open in your browser: http://localhost:8000
 
-#### Frontend
+##### Run the demo
+
+##### Running demo.py
+
+Install meshlab (skip if you have another mesh viewer). If you skip this step, demo code will not visualize the final prediction.
+
+```shell script
+sudo apt-get install meshlab
+```
+
+- Run the demo code and save the final 3D reconstruction to a mesh file named `prediction.obj`
+
+```shell script
+python demo.py prediction.obj
+```
+
+### Training the network
+
+For details on this section please refer to the original repo, this is only a summary.
+
+Activate the virtual environment before you run the experiments.
+
+```
+source py3/bin/activate
+```
+
+Download datasets and place them in a folder named `ShapeNet`
+
+```
+mkdir ShapeNet/
+wget http://cvgl.stanford.edu/data2/ShapeNetRendering.tgz
+wget http://cvgl.stanford.edu/data2/ShapeNetVox32.tgz
+tar -xzf ShapeNetRendering.tgz -C ShapeNet/
+tar -xzf ShapeNetVox32.tgz -C ShapeNet/
+```
+
+- Train and test the network using the training shell script
+
+```
+./experiments/script/res_gru_net.sh
+```
+
+**Note**: The initial compilation might take awhile if you run the theano for the first time due to various compilations. The problem will not persist for the subsequent runs.
+
+#### Client/Frontend
 
 The frontend is a Vue.js application which is entirely separated from the server.
 
@@ -63,7 +118,7 @@ npm run serve
 
 Will provide you will a link to a live recompile entry point.
 
-###### Deployment
+##### Deployment
 
 This will just deploy the Vue application to app/dist which is statically served by the Python server.
 
